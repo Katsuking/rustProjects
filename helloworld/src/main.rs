@@ -2,7 +2,7 @@
 
 use dotenv::dotenv;
 
-mod module; use std::{vec, collections::HashMap, env};
+mod module; use std::{vec, collections::HashMap, env, thread};
 
 // モジュールをインポート
 use module::greet; // モジュールから関数をインポート
@@ -178,6 +178,18 @@ fn main() {
         None => println!("これはさすがにNone"),
     }
 
+    let vecan = vec![1,2,3];
+
+    let handle = thread::spawn(move || {
+        println!("Vector {:?}", vecan);
+    });
+
+    // もしくは、簡単に
+    // handle.join().unwrap_or_default();
+    match handle.join() {
+        Ok(_) => println!("Thread finished successfully"),
+        Err(error) => println!("Error: {:?}", error),
+    };
     
 }
 
