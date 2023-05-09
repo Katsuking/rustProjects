@@ -1,11 +1,15 @@
 // main.rs
 
 use dotenv::dotenv;
-
-mod module; use std::{vec, collections::HashMap, env, thread};
+use polars::{export::chrono::{Local, Utc, Datelike}};
+use native_dialog::{FileDialog, MessageDialog, MessageType};
+mod module; use std::{vec, collections::HashMap, env, thread, fs::File, path::{Path, PathBuf}};
+use glob::glob;
 
 // モジュールをインポート
 use module::greet; // モジュールから関数をインポート
+mod dataframe;
+use dataframe::my_polars;
 
 // ###########################################################
 // struct と method
@@ -117,7 +121,7 @@ fn main() {
     // 環境変数から値の取得
     let dlurl = env::var("DOWNLOAD_PATH").expect("DownloadのPathの設定がされていない。");
     println!("DownloadのPath:{}", dlurl);
-    
+
     // #####################################################
     //  改めて、所有権を変更せずに、一時的に値を借りて、他の場所で使用することができるようにする概念 borrow
     // 複数のスレッドや関数間での値の共有が難しいっていう問題への対処
@@ -154,7 +158,7 @@ fn main() {
     // #####################################################
     //  enum
     // #####################################################
-    
+
     let my_enum = MyEnum::Variant2(32); // 補完機能ででてくれんの熱すぎ
 
     let result = handle_my_enum(my_enum);
@@ -190,7 +194,44 @@ fn main() {
         Ok(_) => println!("Thread finished successfully"),
         Err(error) => println!("Error: {:?}", error),
     };
-    
+
+    // polarsを使ってみる
+    let df = my_polars::create_dataframe();
+    println!("{}", df);
+
+    // ###############################
+    // 日付/時間のライブラリ
+    // ###############################
+    let local = Local::now();
+    println!("ローカル時間の表示:{}", local);
+
+    // 先月の日付を取得
+    let today = Utc::now().date_naive();
+    let last_month = today.with_month(today.month()-1).unwrap();
+    println!("先月:{}", last_month);
+    let formatted = last_month.format("%Y年%m月").to_string();
+    println!("先月 文字列: {} ", formatted);
+
+
+    // ディレクトリの選択
+    let dir_path = FileDialog::new()
+        .set_location(".")
+        .show_open_single_dir()
+        .unwrap();
+
+    let dir_path = match dir_path {
+        Some(dir_path) => dir_path,
+        None => {
+            eprintln!("ダイアログの選択箇所でエラー");
+            std::process::exit(1);
+        },
+    };
+    //
+    println!("{}", dir_path.to_string_lossy().to_string());
+
+    let fls = get_csv_files_in_directory();
+    println!("{:?}", fls);
+
 }
 
 fn change_vector(v: &mut Vec<i32>) {
@@ -216,7 +257,7 @@ fn handle_my_enum(my_enum: MyEnum) -> Result<(), String> {
         },
         MyEnum::Variant2(value) => {
             if value > 100 {
-                Err("Value is too large".to_string())         
+                Err("Value is too large".to_string())
             } else {
                 println!("value is {}", value);
                 Ok(())
@@ -231,7 +272,7 @@ fn handle_my_enum(my_enum: MyEnum) -> Result<(), String> {
                 println!("name:{}, age:{}", name, age);
                 Ok(())
             }
-        } 
+        }
     }
 }
 
@@ -242,4 +283,33 @@ fn divide(a: u32, b:u32) -> Option<u32> {
     } else {
         Some(a/b)
     }
+}
+
+// ディレクトリの選択
+fn select_directory() -> PathBuf {
+    let dir_path = FileDialog::new()
+        .set_location(".")
+        .show_open_single_dir()
+        .unwrap();
+
+    let dir_path = match dir_path {
+        Some(dir_path) => dir_path,
+        None => {
+            eprintln!("ダイアログの選択箇所でエラー");
+            std::process::exit(1);
+        },
+    };
+    dir_path
+}
+
+fn get_csv_files_in_directory() -> Vec<PathBuf> {
+    let dir_path = select_directory();
+    let pattern = format!("{}/*.csv", dir_path.display());
+    let mut csv_files = Vec::new();
+    for entry in glob(&pattern).expect("Failed to read glob pattern") {
+        if let Ok(path) = entry {
+            csv_files.push(path);
+        }
+    }
+    csv_files
 }
