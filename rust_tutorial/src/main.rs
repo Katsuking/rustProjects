@@ -214,6 +214,16 @@ fn main() {
             }
         }
     }
+
+    ///////////////////////////////////////////////////
+    // #[cfg(target_os = "linux")]
+    // のようなattributeについても理解しなくては!
+    if cfg!(target_os = "linux") {
+        are_you_on_linux();
+    } else {
+        println!("You are *not* using Linux")
+    }
+
 }
 
 enum Message {
@@ -265,4 +275,7 @@ fn print_it(data: &str) {
     println!("{:?}", data);
 }
 
-
+#[cfg(target_os = "linux")]
+fn are_you_on_linux() {
+    println!("You are using linux");
+}
