@@ -54,3 +54,5 @@ pub fn open_html(path: PathBuf) -> Result<String, Box<dyn Error>> {
     Ok(contents)
 }
 
+
+
