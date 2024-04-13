@@ -1,0 +1,16 @@
+# rust backend actix-web
+
+GET http://localhost:8080/sushi
+
+###
+
+POST http://localhost:8080/addsushi
+content-type: application/json
+
+{
+  "sushi_name":"tsuna"
+}
+
+###
+
+PATCH http://localhost:8080/updatesushi/abcdefg1111
