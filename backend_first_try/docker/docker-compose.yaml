@@ -1,0 +1,16 @@
+services:
+  db:
+    env_file:
+      - ./.env
+    build:
+      args:
+        - DB_USER=${DB_USER}
+        - DB_PASSWORD=${DB_PASSWORD}
+      context: ./
+      dockerfile: Dockerfile
+    image: db
+    user: root
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data/database.db:/database.db

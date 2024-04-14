@@ -1,5 +1,4 @@
 //
 // models.rs
 pub mod sushi;
-pub use sushi::AddSushiRequest;
-pub use sushi::UpdateSushiURL;
+pub use sushi::{AddSushiRequest, Sushi, UpdateSushiURL};

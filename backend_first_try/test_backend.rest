@@ -14,3 +14,7 @@ content-type: application/json
 ###
 
 PATCH http://localhost:8080/updatesushi/abcdefg1111
+
+### test surrealDB
+
+GET http://localhost:8000/version HTTP/1.1
