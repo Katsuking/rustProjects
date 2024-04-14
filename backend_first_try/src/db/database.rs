@@ -39,7 +39,7 @@ impl Database {
         }
     }
 
-    pub async fn add_new_sushi(&self, new_sushi: Sushi) -> Option<Vec<Sushi>> {
+    pub async fn add_new_sushi(&self, new_sushi: Sushi) -> Option<Sushi> {
         let added_sushi = self
             .client
             .create(("sushi", new_sushi.uuid.clone()))
@@ -47,7 +47,10 @@ impl Database {
             .await;
         match added_sushi {
             Ok(s) => s,
-            Err(_) => None,
+            Err(e) => {
+                println!("error occurred: {:?}", e);
+                None
+            }
         }
     }
 }

@@ -3,12 +3,12 @@
 GET http://localhost:8080/sushi
 
 ###
-
+# {} 空のリクエストを送って、validationの確認
 POST http://localhost:8080/addsushi
 content-type: application/json
 
 {
-  "sushi_name":"tsuna"
+  "sushi_name":"ootoro"
 }
 
 ###
