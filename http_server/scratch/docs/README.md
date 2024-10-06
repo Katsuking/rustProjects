@@ -125,7 +125,7 @@ impl Debug for ParseError {
 
 ### 文字列からEnumへの型変換
 
-[method.rs](../scratch/src/http/method.rs)
+[method.rs](..//src/http/method.rs)
 
 `use std::str::FromStr`の`impl FromStr` はめっちゃよく使われる文字列からいろんな型へ変換を行うtrait
 
