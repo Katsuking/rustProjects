@@ -1,5 +1,6 @@
+mod clock;
 use serde_derive::Deserialize;
-use std::io;
+use std::{env, io};
 
 // csvとは順不同
 #[derive(Debug, Deserialize)]
@@ -25,12 +26,38 @@ fn main() {
 }
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut rdr = csv::Reader::from_reader(io::stdin());
+    // 第一引数を受け取る
+    let query = match env::args().nth(1) {
+        Some(query) => query,
+        None => return Err(From::from("expected 1 arg, but got none")),
+    };
 
-    // deseriazlie で iteratorを作成
-    for result in rdr.deserialize() {
-        let record: Record = result?;
-        println!("{:?}", record)
+    // csv reader と writerを作成
+    let mut rdr = csv::Reader::from_reader(io::stdin());
+    let mut wdr = csv::Writer::from_writer(io::stderr());
+
+    // header情報だけは先に書き込んでおく
+    wdr.write_record(rdr.headers()?)?;
+
+    for result in rdr.records() {
+        let record = result?;
+        // println!("{:?}", record);
+        if record.iter().any(|field| field == &query) {
+            // println!("{:?}", &record)
+            wdr.write_record(&record)?;
+        }
     }
+    // internal bufferを使うので、終了時にflush
+    wdr.flush()?;
     Ok(())
 }
+
+// fn run() -> Result<(), Box<dyn std::error::Error>> {
+//     let mut rdr = csv::Reader::from_reader(io::stdin());
+//     // deseriazlie で iteratorを作成
+//     for result in rdr.deserialize() {
+//         let record: Record = result?;
+//         println!("{:?}", record)
+//     }
+//     Ok(())
+// }
