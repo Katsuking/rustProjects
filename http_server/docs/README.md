@@ -165,3 +165,83 @@ fn try_from<'a>(buf: &'a [u8]) -> Result<Request<'buf>, Self::Error> {
 ```
 bufとRequestは同じlifetimeを持つので、同じにならないといけない。
 
+### dynamic dispatch vs static dispatch
+
+```rust
+impl Response {
+    pub fn new(status_code: StatusCode, body: Option<String>) -> Self {
+        Self { status_code, body }
+    }
+
+    // tcp stream にデータを書き込む
+    // このままだと、TcpStreamにしか書き込めないけど、テストを想定するとここはGeneric であったほうがいい
+    pub fn send(&self, stream: &mut TcpStream) -> ioResult<()> {
+        let body = match &self.body {
+            Some(b) => b,
+            None => "",
+        };
+
+        write!(
+            stream,
+            "HTTP/1.1 {} {}\r\n\r\n{}",
+            self.status_code,
+            self.status_code.reason_phrase(),
+            body
+        )
+    }
+}
+```
+1. Dynamic dispatch
+
+- dyn -> dynamic dispatch
+コンパイル時には、コンパイラは Write トレイトに必要なメソッド
+（この場合は write メソッド）が存在することを確認しますが、
+具体的な型（例えば TcpStream や File、Vec<u8> など）はコンパイル時には決まっていません。
+
+実際の実装のマッピングはランタイム時に行われます。
+Rustでは、トレイトオブジェクトの背後に「バーチャルテーブル（vtable）」が存在し、
+このテーブルが実際の型のメソッドへのポインタを保持します。
+これにより、実行時に適切なメソッドが呼び出されます。
+
+```rust
+pub fn send(&self, stream: &mut dyn Write) -> ioResult<()> {
+    let body = match &self.body {
+        Some(b) => b,
+        None => "",
+    };
+```
+
+2. Static dispatch
+
+vtableを使わなくて良くなるのでパフォーマンスが上がるから基本的にはこっちが使われるが、
+全くデメリットがないわけでもない。
+
+embedded systemではfuncの実装が増えるのでコンパイルサイズが大きくなる
+
+```rust
+
+```
+
+### traiが&mut selfを引数に持つ理由
+
+このようなコード
+
+```rust
+pub trait Handler {
+    fn handle_request(&mut self);
+}
+```
+
+- 状態の変更:
+&mut selfを使用することで、
+Handlerトレイトを実装する型(e.g. struct )の内部状態を変更できるようになります。
+これは、リクエストを処理する際に、そのハンドラーの状態を更新する必要がある場合に便利です。
+
+- 所有権と借用の安全性:
+Rustの所有権システムにより、&mut selfを使うことで、
+一度に一つの可変参照しか持たないというルールが適用されます。
+これにより、データ競合や不正なメモリアクセスを防ぎ、安全な並行処理が可能になります。
+
+- 明示的な意図:
+&mut selfを使うことで、メソッドがオブジェクトの状態を変更することを明示的に示すことができます。
+これにより、コードの可読性が向上し、他の開発者がメソッドの意図を理解しやすくなります。

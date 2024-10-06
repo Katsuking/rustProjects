@@ -1,4 +1,4 @@
-use crate::http::request::Request;
+use crate::http::{ParseError, Request, Response, StatusCode};
 use std::{
     io::{Read, Write},
     net::TcpListener,
@@ -8,6 +8,17 @@ pub struct Server {
     addr: String,
 }
 
+// Response::new()でインスタンスを作るのではなく、
+// Handlerを作って、Responseをさばく
+pub trait Handler {
+    fn handle_request(&mut self, request: &Request) -> Response;
+    fn handle_bad_request(&mut self, e: &ParseError) -> Response {
+        // this is the default implementaion
+        println!("Failed to parse request: {}", e);
+        Response::new(StatusCode::BadRequest, None)
+    }
+}
+
 impl Server {
     // associated func
     pub fn new(addr: String) -> Self {
@@ -15,7 +26,7 @@ impl Server {
     }
 
     // method
-    pub fn run(self) {
+    pub fn run(self, mut handler: impl Handler) {
         println!("running on: {}", self.addr);
         let listener = TcpListener::bind(&self.addr).unwrap();
 
@@ -27,12 +38,12 @@ impl Server {
                         Ok(_) => {
                             println!("Received a request: {}", String::from_utf8_lossy(&buf));
                             // &buf[..]
-                            match Request::try_from(&buf[..]) {
-                                Ok(request) => {
-                                    dbg!(request);
-                                    write!(stream, "HTTP/1.1 404 NotFound\r\n");
-                                }
-                                Err(e) => println!("Error!: {}", e),
+                            let res = match Request::try_from(&buf[..]) {
+                                Ok(request) => handler.handle_request(&request),
+                                Err(e) => handler.handle_bad_request(&e),
+                            };
+                            if let Err(e) = res.send(&mut stream) {
+                                println!("Failed to send response: {}", e)
                             }
                         }
                         Err(e) => println!("Failed to read: {}", e),

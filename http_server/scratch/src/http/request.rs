@@ -1,5 +1,5 @@
 use super::method::{Method, MethodError};
-use super::QueryString;
+use super::{QueryString, Response};
 use std::convert::{From, TryFrom};
 use std::error::Error;
 use std::fmt::{Debug, Display, Result as FmtResult};
@@ -16,6 +16,20 @@ pub struct Request<'buf> {
     path: &'buf str,
     query_string: Option<QueryString<'buf>>,
     method: Method,
+}
+
+impl<'buf> Request<'buf> {
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+    pub fn query_string(&self) -> Option<&QueryString> {
+        // &Option<QueryString> に興味はないので、.as_ref()
+        self.query_string.as_ref()
+    }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
 }
 
 // impl Request {
