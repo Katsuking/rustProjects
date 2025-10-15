@@ -1,3 +1,15 @@
+### permssion error
+
+```sh
+echo "UID=$(id -u)" >> .env && echo "GID=$(id -g)" >> .env
+```
+
+同じユーザーを持つ
+
+```docker-compose
+user: "${UID}:${GID}"
+```
+
 ### diesel cli
 
 ```sh
@@ -9,4 +21,20 @@ docker compose exec app diesel migration generate create_crates # migration フ�
 # sql ファイル作成後
 docker compose exec app diesel migration run # マイグレーションの実行
 docker compose exec app diesel migration revert # マイグレーション rollback
+```
+
+### rust-analyzer
+
+この設定を vscode の setting.json に入れてたらディレクトリ削除したときに
+rust-analyzer がバグるので入れないほうがいい
+
+```json
+// .vscode/settings.json
+{
+  // Make sure the old, deleted path is NOT in this list.
+  "rust-analyzer.linkedProjects": [
+    // "/mnt/su650_adata/development/rustProjects/everyday_rust/day1/temp_converter/Cargo.toml", // <--- DELETE THIS LINE
+    "/path/to/your/current/project/Cargo.toml"
+  ]
+}
 ```

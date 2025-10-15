@@ -1,4 +1,4 @@
-.PHONY: up build log dblog
+.PHONY: up build log dblog permission
 
 up:
 	docker compose up -d
@@ -14,3 +14,6 @@ dblog:
 
 diesel_setup:
 	docker compose exec app diesel setup
+
+permission:
+	sudo chown -R mojo:mojo ./migrations
