@@ -1,4 +1,5 @@
-mod model;
+mod crates;
+mod rustaceans;
 mod schema;
 
 fn main() {
