@@ -21,6 +21,7 @@ target/
 data
 logs
 
+### vscode
 .vscode
 
 ### rust

@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16.0-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_db
+    command: ["postgres", "-c", "log_statement=all"]
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:latest
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db/app_db
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app/
