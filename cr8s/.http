@@ -6,9 +6,9 @@
 
 GET {{baseUrl}}
 
-### Get all tasks
+### returning JSON response
 
-GET {{baseUrl}}/tasks
+GET {{baseUrl}}/user
 
 ### query params
 
