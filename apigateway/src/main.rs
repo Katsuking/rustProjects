@@ -1,40 +1,32 @@
 // Writing Custom Middleware
 
-use axum::{
-  Router,
-  http::{HeaderValue, Request, StatusCode},
-  middleware::{self, Next},
-  response::Response,
-  routing,
-};
-use hyper::header;
+use std::sync::{Arc, Mutex};
 
-/// Middleware that ensures every request has an Authorization header.
-async fn require_auth(req: Request<axum::body::Body>, next: Next) -> Result<Response, StatusCode> {
-  if req.headers().get("Authorization").is_some() {
-    println!("req: {:?}", req);
-    Ok(next.run(req).await)
-  } else {
-    Err(StatusCode::UNAUTHORIZED)
-  }
+use axum::{Router, extract::State, routing};
+
+#[derive(Clone)]
+struct AppState {
+  counter: Arc<Mutex<u32>>,
 }
 
-async fn custom_header() -> Response {
-  let body = "custom body example";
-  Response::builder()
-    .status(StatusCode::OK)
-    .header(header::CONTENT_TYPE, "text/plain")
-    .header("X-App-Version", HeaderValue::from_static("1.0"))
-    .body(body.into())
-    .unwrap()
+async fn increment(State(state): State<AppState>) -> String {
+  // acquire a lock on the counter
+  let mut counter = state.counter.lock().unwrap();
+  *counter += 1;
+  format!("Counter: {}", *counter)
 }
 
 #[tokio::main]
 async fn main() {
+  let state = AppState {
+    // 初期値を0とする
+    counter: Arc::new(Mutex::new(0)),
+  };
   let app = Router::new()
-    .route("/custom_header", routing::post(custom_header))
-    .layer(middleware::from_fn(require_auth));
+    .route("/increment", routing::get(increment))
+    .with_state(state);
   // Define the address and port the server will bind to.
+
   let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
     .await
     .unwrap();

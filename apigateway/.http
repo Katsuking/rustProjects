@@ -10,6 +10,11 @@ GET {{baseUrl}}
 
 GET {{baseUrl}}/user
 
+### mutext arc state
+GET {{baseUrl}}/increment
+
+GET {{baseUrl}}/user
+
 ### query params
 
 GET {{baseUrl}}/items?page=2&limit=10
