@@ -1,5 +1,8 @@
 .PHONY: up build log dblog permission
 
+dev:
+	cargo watch --why -x build
+
 up:
 	docker compose up -d
 
@@ -16,4 +19,4 @@ diesel_setup:
 	docker compose exec app diesel setup
 
 permission:
-	sudo chown -R mojo:mojo ./migrations
+	sudo chown -R mojo:mojo ./

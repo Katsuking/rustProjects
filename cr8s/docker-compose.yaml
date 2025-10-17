@@ -17,7 +17,6 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@db/app_db
     # for permission error
-    user: "${UID}:${GID}"
     ports:
       - 8000:8000
     volumes:
