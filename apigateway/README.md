@@ -55,3 +55,23 @@ rust-analyzer がバグるので入れないほうがいい
   ]
 }
 ```
+
+### Blocking Code in Async Context
+
+Rust’s async runtime is cooperative.
+Blocking operations such as long file reads with `std::fs::read` or
+expensive computations stall the entire executor thread.
+
+Developers sometimes forget to offload blocking work to a separate thread pool.
+
+```rs
+use axum::{routing::get, Router}; use tokio::task;   async fn handler() -> String {
+  // Wrong: This blocks the async runtime
+  let data = std::fs::read_to_string("large.txt").unwrap();
+  // Correct: Offload with `spawn_blocking`
+  let data = task::spawn_blocking(|| std::fs::read_to_string("large.txt"))
+    .await
+    .unwrap()
+    .unwrap();
+  format!("Read {} bytes", data.len()) }
+```
