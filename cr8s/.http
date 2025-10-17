@@ -10,9 +10,9 @@ GET {{baseUrl}}
 
 GET {{baseUrl}}/tasks
 
-### Get one task
+### query params
 
-GET {{baseUrl}}/tasks/12345
+GET {{baseUrl}}/items?page=2&limit=10
 
 ### create new task
 

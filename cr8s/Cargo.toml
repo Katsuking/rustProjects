@@ -18,7 +18,6 @@ diesel-async = { version = "0.4", features = ["postgres"] }
 chrono = "0.4"
 reqwest = { version = "0.12", features = ["json"] }
 openssl-sys = "0.9.110"
-
 # プロキシ（リクエスト転送）用
 hyper = { version = "1", features = ["full"] }
 hyper-util = { version = "0.1", features = ["full"] }

@@ -1,22 +1,24 @@
-// post request
+// extract query params
 
-use axum::{Json, Router, routing::post};
-
+use axum::{Router, extract::Query, routing};
 use serde::Deserialize;
 
-/// Accepts a JSON body and responds with confirmation.
 #[derive(Deserialize)]
-struct Message {
-  content: String,
+struct Pagination {
+  page: Option<u32>,
+  limit: Option<u32>,
 }
 
-async fn post_message(Json(payload): Json<Message>) -> String {
-  format!("Received content: {}!", payload.content)
+async fn list_items(Query(params): Query<Pagination>) -> String {
+  format!(
+    "Listing items on page {:?} with limit {:?}!",
+    params.page, params.limit
+  )
 }
 
 #[tokio::main]
 async fn main() {
-  let app = Router::new().route("/message", post(post_message));
+  let app = Router::new().route("/items", routing::get(list_items));
   // Define the address and port the server will bind to.
   let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
     .await
