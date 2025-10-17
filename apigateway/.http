@@ -15,8 +15,18 @@ GET {{baseUrl}}/user
 GET {{baseUrl}}/items?page=2&limit=10
 
 ### custom header
-
 GET {{baseUrl}}/custom_header
+
+### post middleware
+POST {{baseUrl}}/custom_header
+Authorization: Bearer <token here>
+Content-Type: {{Content-Type}}
+
+{
+  "title": "learn nest.js",
+  "description": "Complete this course",
+  "status": "XXX"
+}
 
 ### create new task
 
