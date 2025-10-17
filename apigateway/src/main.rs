@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 
 use axum::{Router, extract::State, routing};
 
-#[derive(Clone)]
+#[derive(Clone)] // Rustコンパイラが自動的に .clone() メソッドを実装して
 struct AppState {
   counter: Arc<Mutex<u32>>,
 }
