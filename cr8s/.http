@@ -1,0 +1,109 @@
+@baseUrl = http://localhost:8000
+
+@Content-Type = application/json
+
+### basic request
+
+GET {{baseUrl}}
+
+### Get all tasks
+
+GET {{baseUrl}}/tasks
+
+### Get one task
+
+GET {{baseUrl}}/tasks/12345
+
+### create new task
+
+POST {{baseUrl}}/message
+Content-Type: {{Content-Type}}
+
+{
+  "content": "this is content",
+  "sample": "this will be ignored"
+}
+
+### create new task - error
+
+POST {{baseUrl}}/tasks
+Content-Type: {{Content-Type}}
+
+{
+  "title": "learn nest.js",
+  "description": "Complete this course",
+  "status": "XXX"
+}
+
+### get all items
+
+# @name getItems
+GET {{baseUrl}}/items
+
+### set item id 上のレスポンスで返ってきた値をそのまま使える
+
+@itemId = {{ getItems.response.body.$.[0].id }}
+
+### create new item
+
+POST {{baseUrl}}/items
+Authorization: Bearer <token here>
+Content-Type: {{Content-Type}}
+
+{
+  "description": "Complete this course",
+  "name": "what about let's encrypt",
+  "price": 1000
+}
+
+### get item by id
+
+# GET {{baseUrl}}/items/c0b1e45a-de4e-496a-b2b2-bf360a5dfa30
+GET {{baseUrl}}/items/{{itemId}}
+
+### update item status
+
+PATCH {{baseUrl}}/items/{{itemId}}/status
+Authorization: Bearer <ここにsignin で取得したトークン>
+Content-Type: {{Content-Type}}
+
+{
+  "name": "what about let's encrypt",
+  "status": "ON_SALE"
+}
+
+### delete item
+
+DELETE {{baseUrl}}/items/{{itemId}}
+Authorization: Bearer <ここにsignin で取得したトークン>
+
+### signUp
+
+POST {{baseUrl}}/auth/signup
+Content-Type: {{Content-Type}}
+
+{
+  "name": "hello world",
+  "email": "heyyou@gmail.com",
+  "password": "Password1$",
+  "class": "FREE"
+}
+
+### signin
+
+POST {{baseUrl}}/auth/signin
+Content-Type: {{Content-Type}}
+
+{
+  "email": "mantero@gmail.com",
+  "password": "Password1$"
+}
+
+### class rbac
+
+GET {{baseUrl}}/auth/class
+Authorization: Bearer <token here>
+
+
+
+

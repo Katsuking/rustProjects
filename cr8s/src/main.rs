@@ -1,16 +1,22 @@
-// path param パスパラメーターを受け取るには?
+// post request
 
-use axum::{Router, extract::Path, routing::get};
+use axum::{Json, Router, routing::post};
 
-/// Handler that greets the user by name.
-/// The `Path<String>` extractor automatically parses the `:name` parameter from the URL.
-async fn greet(Path(name): Path<String>) -> String {
-  format!("Hello, {}!", name)
+use serde::Deserialize;
+
+/// Accepts a JSON body and responds with confirmation.
+#[derive(Deserialize)]
+struct Message {
+  content: String,
+}
+
+async fn post_message(Json(payload): Json<Message>) -> String {
+  format!("Received content: {}!", payload.content)
 }
 
 #[tokio::main]
 async fn main() {
-  let app = Router::new().route("/greet/{name}", get(greet));
+  let app = Router::new().route("/message", post(post_message));
   // Define the address and port the server will bind to.
   let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
     .await
