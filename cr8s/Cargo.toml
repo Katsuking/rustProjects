@@ -1,9 +1,25 @@
 [package]
-name = "cr8s"
+name = "axum_api_gateway"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+axum = "0.8.6"
+# env file
+dotenvy = "0.15.7"
+
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"]}
+
+tokio = { version = "1.48.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
 diesel = { version = "2.1", features = ["chrono"] }
 diesel-async = { version = "0.4", features = ["postgres"] }
 chrono = "0.4"
+reqwest = { version = "0.12", features = ["json"] }
+openssl-sys = "0.9.110"
+
+# プロキシ（リクエスト転送）用
+hyper = { version = "1", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+http-body-util = "0.1"

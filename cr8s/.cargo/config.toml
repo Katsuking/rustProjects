@@ -1,0 +1,3 @@
+[env]
+# Scope down tracing, to filter out external lib tracing
+RUST_LOG="axum_api_gateway=info"

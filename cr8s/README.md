@@ -23,6 +23,23 @@ docker compose exec app diesel migration run # マイグレーションの実行
 docker compose exec app diesel migration revert # マイグレーション rollback
 ```
 
+### openssl error
+
+```
+warning: openssl-sys@0.9.110: Could not find directory of OpenSSL installation,
+and this `-sys` crate cannot proceed without this knowledge.
+If OpenSSL is installed and this crate had trouble finding it,
+you can set the `OPENSSL_DIR` environment variable for the compilation process.
+See stderr section below for further information.
+error: failed to run custom build command for `openssl-sys v0.9.110`
+```
+
+必要なパッケージのインストール
+
+```sh
+sudo apt install libssl-dev
+```
+
 ### rust-analyzer
 
 この設定を vscode の setting.json に入れてたらディレクトリ削除したときに
